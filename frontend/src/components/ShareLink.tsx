@@ -26,7 +26,7 @@ export default function ShareLink({ url }: { url: string }) {
       />
       <button
         onClick={copy}
-        className="shrink-0 rounded-lg border border-gray-300 dark:border-gray-700 px-3 py-2 text-xs font-medium hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+        className="shrink-0 rounded-lg border border-gray-300 dark:border-gray-700 px-3 py-2 text-xs font-medium hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition-colors"
       >
         {copied ? "Copied!" : "Copy link"}
       </button>

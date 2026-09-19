@@ -87,7 +87,7 @@ export default function CompareForm({ onSubmit, isLoading }: CompareFormProps) {
                 type="button"
                 onClick={() => removeCandidate(i)}
                 disabled={isLoading}
-                className="text-xs text-gray-500 hover:text-red-600 disabled:opacity-50"
+                className="text-xs text-gray-500 hover:text-red-600 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Remove
               </button>
@@ -120,7 +120,7 @@ export default function CompareForm({ onSubmit, isLoading }: CompareFormProps) {
           type="button"
           onClick={addCandidate}
           disabled={isLoading}
-          className="self-start text-sm text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-50"
+          className="self-start text-sm text-blue-600 dark:text-blue-400 hover:underline cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           + Add another candidate
         </button>
@@ -129,7 +129,7 @@ export default function CompareForm({ onSubmit, isLoading }: CompareFormProps) {
       <button
         type="submit"
         disabled={isLoading || validCount < MIN_CANDIDATES}
-        className="rounded-lg bg-blue-600 text-white font-medium py-2 text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="rounded-lg bg-blue-600 text-white font-medium py-2 text-sm hover:bg-blue-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         {isLoading ? "Comparing…" : "Compare"}
       </button>

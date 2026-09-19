@@ -58,7 +58,7 @@ export default function ValidateForm({ onSubmit, isLoading }: ValidateFormProps)
       <button
         type="submit"
         disabled={isLoading || !name.trim()}
-        className="rounded-lg bg-blue-600 text-white font-medium py-2 text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="rounded-lg bg-blue-600 text-white font-medium py-2 text-sm hover:bg-blue-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         {isLoading ? "Validating…" : "Validate"}
       </button>
