@@ -5,10 +5,15 @@ import { FormEvent, useState } from "react";
 interface ValidateFormProps {
   onSubmit: (name: string, pitch: string) => void;
   isLoading: boolean;
+  initialName?: string;
 }
 
-export default function ValidateForm({ onSubmit, isLoading }: ValidateFormProps) {
-  const [name, setName] = useState("");
+export default function ValidateForm({
+  onSubmit,
+  isLoading,
+  initialName = "",
+}: ValidateFormProps) {
+  const [name, setName] = useState(initialName);
   const [pitch, setPitch] = useState("");
 
   function handleSubmit(e: FormEvent) {

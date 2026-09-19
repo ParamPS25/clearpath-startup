@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import ValidateForm from "@/components/ValidateForm";
 import ReportView from "@/components/ReportView";
 import ShareLink from "@/components/ShareLink";
@@ -13,7 +14,10 @@ type State =
   | { phase: "success"; report: ValidationReport }
   | { phase: "error"; message: string };
 
-export default function ValidatePage() {
+function ValidatePageContent() {
+  const searchParams = useSearchParams();
+  const initialName = searchParams.get("name") ?? "";
+
   const [state, setState] = useState<State>({ phase: "idle" });
   const [lastInput, setLastInput] = useState<{ name: string; pitch: string } | null>(
     null,
@@ -44,7 +48,11 @@ export default function ValidatePage() {
         </p>
       </div>
 
-      <ValidateForm onSubmit={runValidation} isLoading={state.phase === "loading"} />
+      <ValidateForm
+        onSubmit={runValidation}
+        isLoading={state.phase === "loading"}
+        initialName={initialName}
+      />
 
       {state.phase === "loading" && (
         <p className="text-sm text-gray-500 animate-pulse">
@@ -73,5 +81,13 @@ export default function ValidatePage() {
         </>
       )}
     </main>
+  );
+}
+
+export default function ValidatePage() {
+  return (
+    <Suspense fallback={null}>
+      <ValidatePageContent />
+    </Suspense>
   );
 }

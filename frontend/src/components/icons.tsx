@@ -43,3 +43,11 @@ export function TrendIcon({ className }: IconProps) {
     </svg>
   );
 }
+
+export function RankIcon({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <path d="M4 6h10M4 12h16M4 18h7" />
+    </svg>
+  );
+}
