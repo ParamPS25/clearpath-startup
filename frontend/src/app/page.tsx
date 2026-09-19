@@ -1,6 +1,5 @@
 import Link from "next/link";
 import HeroSearch from "@/components/HeroSearch";
-import HeroPreviewCard from "@/components/HeroPreviewCard";
 import {
   ChartIcon,
   CompareIcon,
@@ -104,7 +103,6 @@ export default function LandingPage() {
           </div>
 
           <div className="lg:perspective-[1000px]">
-            {/* <HeroPreviewCard /> */}
             <Image
               src="/hero.png"
               alt="Hero preview"
