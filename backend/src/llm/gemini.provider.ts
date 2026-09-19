@@ -13,7 +13,7 @@ export class GeminiProvider implements LlmProvider {
   constructor(private readonly config: ConfigService) {
     const apiKey = this.config.get<string>('GEMINI_API_KEY');
     this.client = apiKey ? new GoogleGenerativeAI(apiKey) : null;
-    this.model = this.config.get<string>('GEMINI_MODEL') ?? 'gemini-2.5-flash';
+    this.model = this.config.get<string>('GEMINI_MODEL') ?? 'gemini-3.6-flash';
   }
 
   async generateJson(
