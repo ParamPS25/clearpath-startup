@@ -55,7 +55,10 @@ export async function validateStartup(
 }
 
 export async function getReport(id: string): Promise<ValidationReport> {
-  const res = await fetchWithTimeout(`/reports/${encodeURIComponent(id)}`);
+  // Reports are immutable once created, so cache indefinitely per id.
+  const res = await fetchWithTimeout(`/reports/${encodeURIComponent(id)}`, {
+    cache: "force-cache",
+  });
 
   if (res.status === 404) {
     throw new NotFoundError("Report not found");
