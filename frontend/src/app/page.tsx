@@ -1,69 +1,68 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import ValidateForm from "@/components/ValidateForm";
+import ReportView from "@/components/ReportView";
+import { validateStartup, ApiError } from "@/lib/api";
+import { ValidationReport } from "@/lib/types";
 
-type HealthResponse = {
-  status: string;
-  timestamp: string;
-};
-
-type HealthState =
+type State =
+  | { phase: "idle" }
   | { phase: "loading" }
-  | { phase: "success"; data: HealthResponse }
+  | { phase: "success"; report: ValidationReport }
   | { phase: "error"; message: string };
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-
 export default function Home() {
-  const [health, setHealth] = useState<HealthState>({ phase: "loading" });
+  const [state, setState] = useState<State>({ phase: "idle" });
+  const [lastInput, setLastInput] = useState<{ name: string; pitch: string } | null>(
+    null,
+  );
 
-  useEffect(() => {
-    let cancelled = false;
-
-    fetch(`${API_BASE_URL}/health`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`Backend responded with ${res.status}`);
-        return res.json();
-      })
-      .then((data: HealthResponse) => {
-        if (!cancelled) setHealth({ phase: "success", data });
-      })
-      .catch((err: Error) => {
-        if (!cancelled) setHealth({ phase: "error", message: err.message });
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  async function runValidation(name: string, pitch: string) {
+    setLastInput({ name, pitch });
+    setState({ phase: "loading" });
+    try {
+      const report = await validateStartup(name, pitch);
+      setState({ phase: "success", report });
+    } catch (err) {
+      const message =
+        err instanceof ApiError
+          ? err.message
+          : "Something went wrong. Please try again.";
+      setState({ phase: "error", message });
+    }
+  }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6 p-8 font-sans">
-      <h1 className="text-2xl font-semibold">Startup Name &amp; Market Validator</h1>
-      <p className="text-sm text-gray-500">Phase 1 — foundation skeleton</p>
-
-      <div className="rounded-lg border border-gray-200 p-4 min-w-[320px] text-center dark:border-gray-800">
-        <p className="text-sm text-gray-500 mb-2">Backend health check</p>
-        {health.phase === "loading" && (
-          <p className="text-gray-600">Checking {API_BASE_URL}/health…</p>
-        )}
-        {health.phase === "success" && (
-          <div>
-            <p className="font-medium text-green-600">
-              status: {health.data.status}
-            </p>
-            <p className="text-xs text-gray-500 mt-1">
-              as of {health.data.timestamp}
-            </p>
-          </div>
-        )}
-        {health.phase === "error" && (
-          <p className="font-medium text-red-600">
-            Failed to reach backend: {health.message}
-          </p>
-        )}
+    <main className="flex min-h-screen flex-col items-center gap-8 p-8 font-sans">
+      <div className="text-center">
+        <h1 className="text-2xl font-semibold">Startup Name &amp; Market Validator</h1>
+        <p className="text-sm text-gray-500 mt-1">
+          Check name clash risk and market crowding before you commit.
+        </p>
       </div>
+
+      <ValidateForm onSubmit={runValidation} isLoading={state.phase === "loading"} />
+
+      {state.phase === "loading" && (
+        <p className="text-sm text-gray-500 animate-pulse">
+          Searching the web and synthesizing a report — this can take up to a minute…
+        </p>
+      )}
+
+      {state.phase === "error" && (
+        <div className="w-full max-w-lg rounded-xl border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950 p-6 text-center flex flex-col gap-3">
+          <p className="text-sm text-red-700 dark:text-red-300">{state.message}</p>
+          <button
+            onClick={() => lastInput && runValidation(lastInput.name, lastInput.pitch)}
+            className="self-center rounded-lg border border-red-400 dark:border-red-700 px-4 py-1.5 text-sm font-medium text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
+      {state.phase === "success" && <ReportView report={state.report} />}
     </main>
   );
 }
