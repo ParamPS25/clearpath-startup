@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Report, ReportDocument } from './report.schema';
-import { ValidationReport } from '../synthesis/schema';
+import { EnrichedValidationReport } from '../synthesis/schema';
 
 @Injectable()
 export class ReportsService {
@@ -13,7 +13,7 @@ export class ReportsService {
   async create(data: {
     name: string;
     pitch?: string;
-    response: ValidationReport;
+    response: EnrichedValidationReport;
   }) {
     return this.model.create(data);
   }

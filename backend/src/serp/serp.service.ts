@@ -1,12 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CacheService } from '../cache/cache.service';
-import { SerpResult, SerpSearchResults } from './serp.types';
+import { SerpResult, SerpSearchResults, TrendPoint } from './serp.types';
 
 const SERP_ENDPOINT = 'https://serpapi.com/search.json';
 const RESULTS_PER_QUERY = 8;
 const KEYWORD_RESULTS_PER_QUERY = 20;
 const CACHE_TTL_SECONDS = 60 * 60; // 1 hour — protects SERP quota during the demo
+const TRENDS_CACHE_TTL_SECONDS = 60 * 60 * 6; // 6 hours — trends move slowly
 
 @Injectable()
 export class SerpService {
@@ -62,6 +63,58 @@ export class SerpService {
     );
     await this.cache.set(cacheKey, results, CACHE_TTL_SECONDS);
     return results;
+  }
+
+  /**
+   * Weekly interest-over-time for the last 12 months (0-100 relative scale).
+   * Returns null on any failure or when Google Trends has no data for the
+   * query at all — very common for brand-new/invented names, since Trends
+   * only has data for terms people already search.
+   */
+  async getSearchTrend(query: string): Promise<TrendPoint[] | null> {
+    const cacheKey = `trends:${query.trim().toLowerCase()}`;
+    const cached = await this.cache.get<TrendPoint[]>(cacheKey);
+    if (cached) {
+      this.logger.log(`Trends cache hit for "${query}"`);
+      return cached;
+    }
+
+    const apiKey = this.config.get<string>('SERP_API_KEY');
+    if (!apiKey) {
+      throw new Error('SERP_API_KEY is not configured');
+    }
+
+    const url = new URL(SERP_ENDPOINT);
+    url.searchParams.set('engine', 'google_trends');
+    url.searchParams.set('q', query);
+    url.searchParams.set('data_type', 'TIMESERIES');
+    url.searchParams.set('date', 'today 12-m');
+    url.searchParams.set('api_key', apiKey);
+
+    const res = await fetch(url.toString());
+    if (!res.ok) {
+      this.logger.warn(`Trends API error ${res.status} for "${query}"`);
+      return null;
+    }
+
+    const data = await res.json();
+    const timeline: any[] = data.interest_over_time?.timeline_data ?? [];
+
+    // Drop the current, incomplete week — it would skew the "recent" average.
+    const points: TrendPoint[] = timeline
+      .filter((t) => !t.partial_data)
+      .map((t) => ({
+        date: t.date ?? '',
+        value: Number(t.values?.[0]?.extracted_value ?? 0),
+      }));
+
+    if (points.length === 0) {
+      this.logger.log(`No Trends data for "${query}"`);
+      return null;
+    }
+
+    await this.cache.set(cacheKey, points, TRENDS_CACHE_TTL_SECONDS);
+    return points;
   }
 
   private buildCacheKey(name: string, pitch?: string): string {

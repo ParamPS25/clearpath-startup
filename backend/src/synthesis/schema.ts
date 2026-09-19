@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { SearchTrend } from './trend';
 
 export const ValidationReportSchema = z.object({
   name: z.string(),
@@ -21,3 +22,9 @@ export const ValidationReportSchema = z.object({
 });
 
 export type ValidationReport = z.infer<typeof ValidationReportSchema>;
+
+// searchTrend is computed deterministically after LLM synthesis (see
+// synthesis.service.ts) — it's never part of the LLM-validated schema above.
+export type EnrichedValidationReport = ValidationReport & {
+  searchTrend: SearchTrend;
+};

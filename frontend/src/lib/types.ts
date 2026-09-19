@@ -8,6 +8,18 @@ export interface Source {
   url: string;
 }
 
+export type TrendDirection = "rising" | "declining" | "flat" | "insufficient_data";
+
+export interface TrendPoint {
+  date: string;
+  value: number;
+}
+
+export interface SearchTrend {
+  direction: TrendDirection;
+  points: TrendPoint[];
+}
+
 export interface ValidationReport {
   id?: string;
   createdAt?: string;
@@ -18,6 +30,7 @@ export interface ValidationReport {
   competitors: Competitor[];
   overallVerdict: string;
   sources: Source[];
+  searchTrend?: SearchTrend;
 }
 
 export interface CandidateInput {

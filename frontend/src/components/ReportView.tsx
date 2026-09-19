@@ -1,12 +1,16 @@
 import { ValidationReport } from "@/lib/types";
 import ScoreBadge from "./ScoreBadge";
+import TrendBadge from "./TrendBadge";
 
 export default function ReportView({ report }: { report: ValidationReport }) {
   return (
     <div className="w-full max-w-2xl flex flex-col gap-6">
-      <div className="rounded-xl border border-gray-200 dark:border-gray-800 p-6 text-center">
-        <p className="text-sm text-gray-500 mb-2">Overall verdict</p>
-        <p className="text-lg font-semibold">{report.overallVerdict}</p>
+      <div className="rounded-xl border border-gray-200 dark:border-gray-800 p-6 text-center flex flex-col items-center gap-3">
+        <div>
+          <p className="text-sm text-gray-500 mb-2">Overall verdict</p>
+          <p className="text-lg font-semibold">{report.overallVerdict}</p>
+        </div>
+        {report.searchTrend && <TrendBadge trend={report.searchTrend} />}
       </div>
 
       <div className="flex flex-col items-center gap-3 rounded-xl border border-gray-200 dark:border-gray-800 p-6">

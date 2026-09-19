@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ValidationReport } from "@/lib/types";
 import ScoreBadge from "./ScoreBadge";
+import TrendBadge from "./TrendBadge";
 
 export function CompareCard({
   report,
@@ -29,6 +30,7 @@ export function CompareCard({
       )}
       <h3 className="font-semibold text-lg truncate">{report.name}</h3>
       <ScoreBadge score={report.nameClashScore} />
+      {report.searchTrend && <TrendBadge trend={report.searchTrend} />}
       <p className="text-sm text-gray-600 dark:text-gray-400">{report.overallVerdict}</p>
 
       {count === 0 ? (

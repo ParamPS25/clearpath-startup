@@ -8,3 +8,8 @@ export interface SerpSearchResults {
   nameResults: SerpResult[];
   marketResults: SerpResult[];
 }
+
+export interface TrendPoint {
+  date: string;
+  value: number;
+}

@@ -8,12 +8,12 @@ import {
 } from '@nestjs/common';
 import { SynthesisService } from '../synthesis/synthesis.service';
 import { ReportsService } from '../reports/reports.service';
-import { ValidationReport } from '../synthesis/schema';
+import { EnrichedValidationReport } from '../synthesis/schema';
 import { ValidateRequestDto } from './dto/validate-request.dto';
 import { CompareRequestDto } from './dto/compare-request.dto';
 import { buildRecommendation } from './recommendation';
 
-type ReportWithId = ValidationReport & { id?: string };
+type ReportWithId = EnrichedValidationReport & { id?: string };
 
 @Controller('validate')
 export class ValidateController {

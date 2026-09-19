@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { ValidationReport } from '../synthesis/schema';
+import { EnrichedValidationReport } from '../synthesis/schema';
 
 @Schema({
   timestamps: { createdAt: true, updatedAt: false },
@@ -14,7 +14,7 @@ export class Report {
   pitch?: string;
 
   @Prop({ type: Object, required: true })
-  response: ValidationReport;
+  response: EnrichedValidationReport;
 
   createdAt?: Date;
 }
