@@ -17,7 +17,7 @@ export function CompareCard({
 
   return (
     <div
-      className={`flex flex-col gap-3 rounded-xl border p-5 ${
+      className={`flex flex-col gap-3 rounded-2xl border bg-white dark:bg-gray-900/40 shadow-sm p-5 ${
         isRecommended
           ? "border-blue-500 ring-2 ring-blue-500/30"
           : "border-gray-200 dark:border-gray-800"
@@ -68,7 +68,7 @@ export function CompareCard({
 
 export function CompareErrorCard({ name, error }: { name: string; error: string }) {
   return (
-    <div className="flex flex-col gap-2 rounded-xl border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950 p-5">
+    <div className="flex flex-col gap-2 rounded-2xl border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950 shadow-sm p-5">
       <h3 className="font-semibold text-lg truncate">{name}</h3>
       <p className="text-sm text-red-700 dark:text-red-300">Failed to validate: {error}</p>
     </div>

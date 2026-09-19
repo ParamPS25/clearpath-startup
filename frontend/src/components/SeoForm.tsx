@@ -35,6 +35,8 @@ export default function SeoForm({ onSubmit, isLoading }: SeoFormProps) {
   }
 
   const validKeywords = keywords.map((k) => k.trim()).filter(Boolean);
+  const inputClasses =
+    "rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 transition-colors";
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -50,9 +52,9 @@ export default function SeoForm({ onSubmit, isLoading }: SeoFormProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full max-w-lg flex flex-col gap-4 rounded-xl border border-gray-200 dark:border-gray-800 p-6"
+      className="w-full max-w-lg flex flex-col gap-5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/40 shadow-sm p-7"
     >
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1.5">
         <label htmlFor="businessName" className="text-sm font-medium">
           Business name
         </label>
@@ -65,11 +67,11 @@ export default function SeoForm({ onSubmit, isLoading }: SeoFormProps) {
           maxLength={100}
           required
           disabled={isLoading}
-          className="rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+          className={inputClasses}
         />
       </div>
 
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1.5">
         <label htmlFor="domain" className="text-sm font-medium">
           Domain
         </label>
@@ -82,11 +84,11 @@ export default function SeoForm({ onSubmit, isLoading }: SeoFormProps) {
           maxLength={253}
           required
           disabled={isLoading}
-          className="rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+          className={inputClasses}
         />
       </div>
 
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1.5">
         <label htmlFor="location" className="text-sm font-medium">
           Location <span className="text-gray-500 font-normal">(optional)</span>
         </label>
@@ -98,11 +100,11 @@ export default function SeoForm({ onSubmit, isLoading }: SeoFormProps) {
           placeholder="e.g. Austin, Texas"
           maxLength={100}
           disabled={isLoading}
-          className="rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+          className={inputClasses}
         />
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2.5">
         <label className="text-sm font-medium">Target keywords</label>
         {keywords.map((k, i) => (
           <div key={i} className="flex items-center gap-2">
@@ -113,7 +115,7 @@ export default function SeoForm({ onSubmit, isLoading }: SeoFormProps) {
               placeholder="e.g. note taking app"
               maxLength={100}
               disabled={isLoading}
-              className="flex-1 rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              className={`flex-1 ${inputClasses}`}
             />
             {keywords.length > 1 && (
               <button
@@ -142,7 +144,7 @@ export default function SeoForm({ onSubmit, isLoading }: SeoFormProps) {
       <button
         type="submit"
         disabled={isLoading || !businessName.trim() || !domain.trim() || validKeywords.length === 0}
-        className="rounded-lg bg-blue-600 text-white font-medium py-2 text-sm hover:bg-blue-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="rounded-lg bg-blue-600 text-white font-medium py-2.5 text-sm hover:bg-blue-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         {isLoading ? "Checking…" : "Check rankings"}
       </button>

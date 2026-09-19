@@ -40,6 +40,8 @@ export default function CompareForm({ onSubmit, isLoading }: CompareFormProps) {
   }
 
   const validCount = candidates.filter((c) => c.name.trim()).length;
+  const inputClasses =
+    "rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 transition-colors";
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -54,9 +56,9 @@ export default function CompareForm({ onSubmit, isLoading }: CompareFormProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full max-w-2xl flex flex-col gap-4 rounded-xl border border-gray-200 dark:border-gray-800 p-6"
+      className="w-full max-w-2xl flex flex-col gap-5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/40 shadow-sm p-7"
     >
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1.5">
         <label htmlFor="sharedPitch" className="text-sm font-medium">
           Shared pitch{" "}
           <span className="text-gray-500 font-normal">
@@ -71,14 +73,14 @@ export default function CompareForm({ onSubmit, isLoading }: CompareFormProps) {
           maxLength={500}
           disabled={isLoading}
           placeholder="One line describing the product"
-          className="rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+          className={`${inputClasses} resize-none`}
         />
       </div>
 
       {candidates.map((c, i) => (
         <div
           key={i}
-          className="flex flex-col gap-2 rounded-lg border border-gray-200 dark:border-gray-800 p-3"
+          className="flex flex-col gap-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/60 p-4"
         >
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">Candidate {i + 1}</span>
@@ -101,7 +103,7 @@ export default function CompareForm({ onSubmit, isLoading }: CompareFormProps) {
             maxLength={100}
             required
             disabled={isLoading}
-            className="rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            className={`${inputClasses} bg-white dark:bg-transparent`}
           />
           <input
             type="text"
@@ -110,7 +112,7 @@ export default function CompareForm({ onSubmit, isLoading }: CompareFormProps) {
             placeholder="Pitch override (optional)"
             maxLength={500}
             disabled={isLoading}
-            className="rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            className={`${inputClasses} bg-white dark:bg-transparent`}
           />
         </div>
       ))}
@@ -129,9 +131,9 @@ export default function CompareForm({ onSubmit, isLoading }: CompareFormProps) {
       <button
         type="submit"
         disabled={isLoading || validCount < MIN_CANDIDATES}
-        className="rounded-lg bg-blue-600 text-white font-medium py-2 text-sm hover:bg-blue-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="rounded-lg bg-blue-600 text-white font-medium py-2.5 text-sm hover:bg-blue-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
-        {isLoading ? "Comparing…" : "Compare"}
+        {isLoading ? "Comparing…" : "Compare names"}
       </button>
     </form>
   );

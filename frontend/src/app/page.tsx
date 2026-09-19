@@ -1,24 +1,29 @@
 import Link from "next/link";
+import { ChartIcon, CompareIcon, SearchIcon, TrendIcon } from "@/components/icons";
 
 const FEATURES = [
   {
-    title: "Name clash score",
-    body: "Searches for existing companies, apps, and trademarks using the name you're considering, and scores how likely it is to collide with something that already exists.",
+    icon: SearchIcon,
+    title: "Check a name",
+    body: "See if it clashes with existing companies, apps, or trademarks — and whether search interest in it is rising or fading.",
     href: "/validate",
   },
   {
+    icon: ChartIcon,
     title: "Market landscape",
-    body: "Surfaces real competitors in the same space from live search results, with the source cited for every claim — nothing invented.",
+    body: "Real competitors surfaced from live search results, with every claim cited back to its source — nothing invented.",
     href: "/validate",
   },
   {
-    title: "Comparison mode",
-    body: "Run two or three candidate names side by side and see which one comes out ahead, with the reasoning behind the pick shown plainly.",
+    icon: CompareIcon,
+    title: "Compare candidates",
+    body: "Run two or three names side by side and see which one wins, with the reasoning shown plainly.",
     href: "/compare",
   },
   {
+    icon: TrendIcon,
     title: "SEO rank check",
-    body: "See where a domain currently ranks for the keywords that matter, and which pages are outranking it and why.",
+    body: "See where a domain ranks for the keywords that matter, and exactly who's outranking it.",
     href: "/seo-check",
   },
 ];
@@ -32,7 +37,7 @@ const STEPS = [
   {
     n: "02",
     title: "We search and synthesize",
-    body: "Two searches run in parallel, and the raw results get turned into a scored, structured report.",
+    body: "Searches run in parallel, and the raw results get turned into a scored, structured report.",
   },
   {
     n: "03",
@@ -53,6 +58,9 @@ export default function LandingPage() {
         </div>
 
         <div className="mx-auto max-w-3xl px-6 pt-20 pb-16 text-center flex flex-col items-center gap-5">
+          <span className="text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+            Startup name toolkit
+          </span>
           <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight text-balance">
             Know if the name is taken before you build the brand.
           </h1>
@@ -65,7 +73,7 @@ export default function LandingPage() {
               href="/validate"
               className="rounded-lg bg-blue-600 text-white font-medium px-5 py-2.5 text-sm hover:bg-blue-700 transition-colors"
             >
-              Validate a name
+              Check a name
             </Link>
             <Link
               href="/compare"
@@ -87,8 +95,11 @@ export default function LandingPage() {
               <Link
                 key={f.title}
                 href={f.href}
-                className="group flex flex-col gap-2 rounded-xl border border-gray-200 dark:border-gray-800 p-5 hover:border-blue-400 dark:hover:border-blue-700 transition-colors"
+                className="group flex flex-col gap-3 rounded-xl border border-gray-200 dark:border-gray-800 p-5 hover:border-blue-400 dark:hover:border-blue-700 hover:shadow-sm transition-all"
               >
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
+                  <f.icon className="h-5 w-5" />
+                </div>
                 <h3 className="font-semibold group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                   {f.title}
                 </h3>
@@ -99,7 +110,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="w-full border-t border-gray-200 dark:border-gray-800">
+      <section className="w-full border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950/50">
         <div className="mx-auto max-w-5xl px-6 py-16">
           <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-6">
             How it works
@@ -107,7 +118,7 @@ export default function LandingPage() {
           <div className="grid gap-8 sm:grid-cols-3">
             {STEPS.map((s) => (
               <div key={s.n} className="flex flex-col gap-2">
-                <span className="text-3xl font-semibold text-gray-200 dark:text-gray-800">
+                <span className="text-3xl font-semibold text-gray-300 dark:text-gray-700">
                   {s.n}
                 </span>
                 <h3 className="font-semibold">{s.title}</h3>

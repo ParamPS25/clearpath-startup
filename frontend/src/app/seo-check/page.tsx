@@ -63,7 +63,7 @@ export default function SeoCheckPage() {
       )}
 
       {state.phase === "error" && (
-        <div className="w-full max-w-lg rounded-xl border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950 p-6 text-center flex flex-col gap-3">
+        <div className="w-full max-w-lg rounded-2xl border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950 shadow-sm p-6 text-center flex flex-col gap-3">
           <p className="text-sm text-red-700 dark:text-red-300">{state.message}</p>
           <button
             onClick={() =>
@@ -84,7 +84,7 @@ export default function SeoCheckPage() {
 
       {state.phase === "success" && (
         <div className="w-full max-w-3xl flex flex-col gap-6">
-          <div className="rounded-xl border border-blue-300 dark:border-blue-800 bg-blue-50 dark:bg-blue-950 p-4 text-center">
+          <div className="rounded-2xl border border-blue-300 dark:border-blue-800 bg-blue-50 dark:bg-blue-950 shadow-sm p-4 text-center">
             <p className="text-sm text-blue-800 dark:text-blue-300">
               {state.report.summary}
             </p>

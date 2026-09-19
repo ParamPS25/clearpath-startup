@@ -17,7 +17,7 @@ export default function SeoResultCard({ result }: { result: KeywordRankResult })
   const { keyword, position, topCompetitors, explanation } = result;
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+    <div className="flex flex-col gap-3 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/40 shadow-sm p-5">
       <div className="flex items-center justify-between gap-3">
         <h3 className="font-semibold">{keyword}</h3>
         <span

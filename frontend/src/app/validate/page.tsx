@@ -37,9 +37,10 @@ export default function ValidatePage() {
   return (
     <main className="flex min-h-[calc(100vh-56px)] flex-col items-center gap-8 px-6 py-12">
       <div className="text-center flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Validate a name</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Check a name</h1>
         <p className="text-sm text-gray-500">
-          Check name clash risk and market crowding before you commit.
+          See if it&apos;s taken, how crowded the market is, and where search interest
+          is headed.
         </p>
       </div>
 
@@ -52,7 +53,7 @@ export default function ValidatePage() {
       )}
 
       {state.phase === "error" && (
-        <div className="w-full max-w-lg rounded-xl border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950 p-6 text-center flex flex-col gap-3">
+        <div className="w-full max-w-lg rounded-2xl border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950 shadow-sm p-6 text-center flex flex-col gap-3">
           <p className="text-sm text-red-700 dark:text-red-300">{state.message}</p>
           <button
             onClick={() => lastInput && runValidation(lastInput.name, lastInput.pitch)}
