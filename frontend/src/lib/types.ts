@@ -19,3 +19,20 @@ export interface ValidationReport {
   overallVerdict: string;
   sources: Source[];
 }
+
+export interface CandidateInput {
+  name: string;
+  pitch?: string;
+}
+
+export type CompareResult = ValidationReport | { name: string; error: string };
+
+export interface CompareResponse {
+  results: CompareResult[];
+  recommendation: string;
+  recommendedName: string;
+}
+
+export function isReportResult(result: CompareResult): result is ValidationReport {
+  return !("error" in result);
+}

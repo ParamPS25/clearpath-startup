@@ -1,9 +1,10 @@
-import { ValidationReport } from "./types";
+import { CandidateInput, CompareResponse, ValidationReport } from "./types";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
 const REQUEST_TIMEOUT_MS = 60_000;
+const COMPARE_TIMEOUT_MS = 90_000;
 
 export class ApiError extends Error {}
 export class NotFoundError extends ApiError {}
@@ -11,9 +12,10 @@ export class NotFoundError extends ApiError {}
 async function fetchWithTimeout(
   path: string,
   init?: RequestInit,
+  timeoutMs: number = REQUEST_TIMEOUT_MS,
 ): Promise<Response> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
     return await fetch(`${API_BASE_URL}${path}`, {
@@ -43,6 +45,33 @@ export async function validateStartup(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name, pitch: pitch || undefined }),
   });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new ApiError(
+      body?.message ?? `Request failed with status ${res.status}`,
+    );
+  }
+
+  return res.json();
+}
+
+export async function compareStartups(
+  candidates: CandidateInput[],
+  sharedPitch?: string,
+): Promise<CompareResponse> {
+  const res = await fetchWithTimeout(
+    "/validate/compare",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        candidates,
+        sharedPitch: sharedPitch || undefined,
+      }),
+    },
+    COMPARE_TIMEOUT_MS,
+  );
 
   if (!res.ok) {
     const body = await res.json().catch(() => null);

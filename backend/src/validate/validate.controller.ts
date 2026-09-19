@@ -8,7 +8,12 @@ import {
 } from '@nestjs/common';
 import { SynthesisService } from '../synthesis/synthesis.service';
 import { ReportsService } from '../reports/reports.service';
+import { ValidationReport } from '../synthesis/schema';
 import { ValidateRequestDto } from './dto/validate-request.dto';
+import { CompareRequestDto } from './dto/compare-request.dto';
+import { buildRecommendation } from './recommendation';
+
+type ReportWithId = ValidationReport & { id?: string };
 
 @Controller('validate')
 export class ValidateController {
@@ -21,9 +26,8 @@ export class ValidateController {
 
   @Post()
   async validate(@Body() dto: ValidateRequestDto) {
-    let report;
     try {
-      report = await this.synthesis.validate(dto.name, dto.pitch);
+      return await this.validateAndPersist(dto.name, dto.pitch);
     } catch (err) {
       throw new HttpException(
         {
@@ -33,17 +37,55 @@ export class ValidateController {
         HttpStatus.BAD_GATEWAY,
       );
     }
+  }
+
+  @Post('compare')
+  async compare(@Body() dto: CompareRequestDto) {
+    const settled = await Promise.allSettled(
+      dto.candidates.map((candidate) =>
+        this.validateAndPersist(
+          candidate.name,
+          candidate.pitch || dto.sharedPitch,
+        ),
+      ),
+    );
+
+    const results = settled.map((outcome, i) =>
+      outcome.status === 'fulfilled'
+        ? outcome.value
+        : {
+            name: dto.candidates[i].name,
+            error: (outcome.reason as Error).message,
+          },
+    );
+
+    const succeeded = results.filter((r): r is ReportWithId => !('error' in r));
+
+    if (succeeded.length === 0) {
+      throw new HttpException(
+        { message: 'Failed to generate any comparison reports' },
+        HttpStatus.BAD_GATEWAY,
+      );
+    }
+
+    const { text, recommendedName } = buildRecommendation(succeeded);
+    return { results, recommendation: text, recommendedName };
+  }
+
+  private async validateAndPersist(
+    name: string,
+    pitch?: string,
+  ): Promise<ReportWithId> {
+    const report = await this.synthesis.validate(name, pitch);
 
     let id: string | undefined;
     try {
-      const doc = await this.reports.create({
-        name: dto.name,
-        pitch: dto.pitch,
-        response: report,
-      });
+      const doc = await this.reports.create({ name, pitch, response: report });
       id = doc._id.toString();
     } catch (err) {
-      this.logger.warn(`Failed to persist report: ${(err as Error).message}`);
+      this.logger.warn(
+        `Failed to persist report for "${name}": ${(err as Error).message}`,
+      );
     }
 
     return { ...report, id };

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import ValidateForm from "@/components/ValidateForm";
 import ReportView from "@/components/ReportView";
 import ShareLink from "@/components/ShareLink";
@@ -41,6 +42,12 @@ export default function Home() {
         <p className="text-sm text-gray-500 mt-1">
           Check name clash risk and market crowding before you commit.
         </p>
+        <Link
+          href="/compare"
+          className="text-xs text-blue-600 dark:text-blue-400 hover:underline mt-2 inline-block"
+        >
+          Compare 2–3 candidate names →
+        </Link>
       </div>
 
       <ValidateForm onSubmit={runValidation} isLoading={state.phase === "loading"} />
