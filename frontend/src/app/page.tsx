@@ -3,6 +3,7 @@
 import { useState } from "react";
 import ValidateForm from "@/components/ValidateForm";
 import ReportView from "@/components/ReportView";
+import ShareLink from "@/components/ShareLink";
 import { validateStartup, ApiError } from "@/lib/api";
 import { ValidationReport } from "@/lib/types";
 
@@ -62,7 +63,14 @@ export default function Home() {
         </div>
       )}
 
-      {state.phase === "success" && <ReportView report={state.report} />}
+      {state.phase === "success" && (
+        <>
+          {state.report.id && (
+            <ShareLink url={`${window.location.origin}/report/${state.report.id}`} />
+          )}
+          <ReportView report={state.report} />
+        </>
+      )}
     </main>
   );
 }

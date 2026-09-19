@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Report, ReportDocument } from './report.schema';
 import { ValidationReport } from '../synthesis/schema';
 
@@ -16,5 +16,10 @@ export class ReportsService {
     response: ValidationReport;
   }) {
     return this.model.create(data);
+  }
+
+  async findById(id: string): Promise<ReportDocument | null> {
+    if (!Types.ObjectId.isValid(id)) return null;
+    return this.model.findById(id).exec();
   }
 }

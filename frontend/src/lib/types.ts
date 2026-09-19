@@ -9,6 +9,8 @@ export interface Source {
 }
 
 export interface ValidationReport {
+  id?: string;
+  createdAt?: string;
   name: string;
   nameClashScore: number;
   nameClashReason: string;

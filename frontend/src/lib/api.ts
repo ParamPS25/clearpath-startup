@@ -6,20 +6,18 @@ const API_BASE_URL =
 const REQUEST_TIMEOUT_MS = 60_000;
 
 export class ApiError extends Error {}
+export class NotFoundError extends ApiError {}
 
-export async function validateStartup(
-  name: string,
-  pitch?: string,
-): Promise<ValidationReport> {
+async function fetchWithTimeout(
+  path: string,
+  init?: RequestInit,
+): Promise<Response> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
-  let res: Response;
   try {
-    res = await fetch(`${API_BASE_URL}/validate`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, pitch: pitch || undefined }),
+    return await fetch(`${API_BASE_URL}${path}`, {
+      ...init,
       signal: controller.signal,
     });
   } catch (err) {
@@ -33,6 +31,34 @@ export async function validateStartup(
     );
   } finally {
     clearTimeout(timeout);
+  }
+}
+
+export async function validateStartup(
+  name: string,
+  pitch?: string,
+): Promise<ValidationReport> {
+  const res = await fetchWithTimeout("/validate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, pitch: pitch || undefined }),
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new ApiError(
+      body?.message ?? `Request failed with status ${res.status}`,
+    );
+  }
+
+  return res.json();
+}
+
+export async function getReport(id: string): Promise<ValidationReport> {
+  const res = await fetchWithTimeout(`/reports/${encodeURIComponent(id)}`);
+
+  if (res.status === 404) {
+    throw new NotFoundError("Report not found");
   }
 
   if (!res.ok) {

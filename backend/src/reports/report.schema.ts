@@ -15,6 +15,8 @@ export class Report {
 
   @Prop({ type: Object, required: true })
   response: ValidationReport;
+
+  createdAt?: Date;
 }
 
 export type ReportDocument = Report & Document;

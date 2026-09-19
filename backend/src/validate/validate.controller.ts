@@ -34,16 +34,18 @@ export class ValidateController {
       );
     }
 
+    let id: string | undefined;
     try {
-      await this.reports.create({
+      const doc = await this.reports.create({
         name: dto.name,
         pitch: dto.pitch,
         response: report,
       });
+      id = doc._id.toString();
     } catch (err) {
       this.logger.warn(`Failed to persist report: ${(err as Error).message}`);
     }
 
-    return report;
+    return { ...report, id };
   }
 }
