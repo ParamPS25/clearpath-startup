@@ -316,12 +316,13 @@ quote (e.g. "issue tracking software" surfaced fitness-tracker results until quo
 
 ---
 
-## Phase 7.6 — Search interest trend + domain/handle availability *(in progress)*
+## Phase 7.6 — Search interest trend *(in progress)*
 
-**Goal:** two small, high-signal additions to the existing `/validate` report — both
-computed from real data, not LLM guesses.
+**Goal:** a small, high-signal addition to the existing `/validate` report, computed from
+real data, not an LLM guess.
 
-### 1. Search interest trend
+*Domain & social handle availability (originally scoped as part of this phase, research
+above) was explicitly dropped — trend only for now.*
 
 Show whether interest in the candidate name is rising, flat, or declining over the last
 12 months, using SerpApi's `google_trends` engine (`data_type=TIMESERIES`,
@@ -348,34 +349,14 @@ doesn't introduce a new integration pattern.
 - [ ] A made-up name shows the explicit "not enough data" state, not a fabricated flat
       line.
 
-### 2. Domain & social handle availability
-
-Complements the name clash score directly: a company search coming back empty doesn't
-mean the domain or handle is actually free.
-
-- **Domain (`.com` only for now):** [RDAP](https://rdap.org) lookup — `200` = registered,
-  `404` = available, anything else = unknown (shown as such, never guessed). No API key
-  needed.
-  - **Verified limitation, scoped around rather than shipped broken:** RDAP's public
-    bootstrap redirector gives false "available" results for `.io`/`.co`/`.so` — it
-    reported `github.io`, `vercel.co`, and `notion.so` as available when they obviously
-    aren't. Only `.com` (via Verisign's RDAP, confirmed reliable) is checked in this
-    phase; other TLDs are a future extension once a trustworthy free source is found.
-- **GitHub handle:** `GET api.github.com/users/<handle>` — `200` = taken, `404` =
-  available. Free, no key, reliable.
-  - **Twitter/X, Instagram, TikTok are explicitly out of scope for now** — there is no
-    reliable free way to check handle availability on them (no free API; scraping their
-    profile pages is blocked/unreliable and would risk showing a wrong answer live in a
-    demo, which is worse than not showing one).
-- Attached to the report as `availability` — same bolted-on-after-synthesis pattern as
-  `searchTrend` and `id`.
-- Frontend: two small badges (domain, GitHub handle) near the name clash score —
-  Available / Taken / Unknown, never a false positive presented as fact.
-
-**Acceptance criteria (manual test):**
-- [ ] A well-known taken name shows both domain and GitHub handle as taken.
-- [ ] A genuinely available invented name shows both as available.
-- [ ] An RDAP/GitHub API failure shows "unknown," not a silently wrong answer.
+*Note on the dropped domain/handle idea, kept for whoever picks it up later: RDAP
+(https://rdap.org) is a reliable, keyless way to check `.com` registration (`200` =
+taken, `404` = available), but its public bootstrap redirector gives false "available"
+results for `.io`/`.co`/`.so` (verified against `github.io`, `vercel.co`, `notion.so` —
+all wrongly reported as free). GitHub's `api.github.com/users/<handle>` is a reliable,
+free way to check a handle. Twitter/X, Instagram, and TikTok have no reliable free
+method — scraping their profile pages is blocked/unreliable enough to risk a wrong
+answer live in a demo.*
 
 ---
 
