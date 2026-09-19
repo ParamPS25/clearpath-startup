@@ -18,10 +18,10 @@ export default function Header() {
       <div className="mx-auto max-w-5xl px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
         <Link
           href="/"
-          className="flex items-center gap-2 shrink-0 hover:opacity-80 transition-opacity"
+          className="flex items-center gap-1 shrink-0 hover:opacity-80 transition-opacity"
         >
           <LogoMark />
-          <span className="text-sm font-semibold tracking-tight">Clearpath</span>
+          <span className="text-lg font-semibold tracking-tight">Clear<span>path</span></span>
         </Link>
 
         <nav className="flex items-center gap-0.5 sm:gap-1">
