@@ -1,10 +1,11 @@
-import { CandidateInput, CompareResponse, ValidationReport } from "./types";
+import { CandidateInput, CompareResponse, SeoRankReport, ValidationReport } from "./types";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
 const REQUEST_TIMEOUT_MS = 60_000;
 const COMPARE_TIMEOUT_MS = 90_000;
+const SEO_TIMEOUT_MS = 90_000;
 
 export class ApiError extends Error {}
 export class NotFoundError extends ApiError {}
@@ -71,6 +72,37 @@ export async function compareStartups(
       }),
     },
     COMPARE_TIMEOUT_MS,
+  );
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new ApiError(
+      body?.message ?? `Request failed with status ${res.status}`,
+    );
+  }
+
+  return res.json();
+}
+
+export async function checkSeoRankings(
+  businessName: string,
+  domain: string,
+  keywords: string[],
+  location?: string,
+): Promise<SeoRankReport> {
+  const res = await fetchWithTimeout(
+    "/seo-rank",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        businessName,
+        domain,
+        keywords,
+        location: location || undefined,
+      }),
+    },
+    SEO_TIMEOUT_MS,
   );
 
   if (!res.ok) {

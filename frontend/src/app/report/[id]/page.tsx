@@ -25,14 +25,14 @@ export default async function ReportPage({
 
   if (report) {
     return (
-      <main className="flex min-h-screen flex-col items-center gap-8 p-8 font-sans">
+      <main className="flex min-h-[calc(100vh-56px)] flex-col items-center gap-8 p-8">
         <ReportView report={report} />
       </main>
     );
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-3 p-8 text-center">
+    <main className="flex min-h-[calc(100vh-56px)] flex-col items-center justify-center gap-3 p-8 text-center">
       <p className="text-lg font-medium">
         {isNotFound ? "Report not found" : "Something went wrong"}
       </p>

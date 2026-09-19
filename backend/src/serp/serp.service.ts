@@ -5,6 +5,7 @@ import { SerpResult, SerpSearchResults } from './serp.types';
 
 const SERP_ENDPOINT = 'https://serpapi.com/search.json';
 const RESULTS_PER_QUERY = 8;
+const KEYWORD_RESULTS_PER_QUERY = 20;
 const CACHE_TTL_SECONDS = 60 * 60; // 1 hour — protects SERP quota during the demo
 
 @Injectable()
@@ -35,13 +36,51 @@ export class SerpService {
     return results;
   }
 
+  /** Raw organic results for one keyword — used by the SEO rank checker. */
+  async searchKeyword(
+    keyword: string,
+    location?: string,
+  ): Promise<SerpResult[]> {
+    const cacheKey = this.buildKeywordCacheKey(keyword, location);
+    const cached = await this.cache.get<SerpResult[]>(cacheKey);
+    if (cached) {
+      this.logger.log(`SERP cache hit for keyword "${keyword}"`);
+      return cached;
+    }
+
+    this.logger.log(
+      `SERP cache miss for keyword "${keyword}", calling SerpApi`,
+    );
+    // Unquoted, an unusual amount of loose word-matching creeps in for
+    // generic phrases (e.g. "issue tracking software" surfacing results
+    // about tracking sleep apps) — an exact phrase match keeps results on
+    // topic, which matters here since the whole point is ranking for it.
+    const results = await this.runQuery(
+      `"${keyword}"`,
+      location,
+      KEYWORD_RESULTS_PER_QUERY,
+    );
+    await this.cache.set(cacheKey, results, CACHE_TTL_SECONDS);
+    return results;
+  }
+
   private buildCacheKey(name: string, pitch?: string): string {
     const normalizedName = name.trim().toLowerCase();
     const normalizedPitch = (pitch ?? '').trim().toLowerCase();
     return `serp:${normalizedName}:${normalizedPitch}`;
   }
 
-  private async runQuery(query: string): Promise<SerpResult[]> {
+  private buildKeywordCacheKey(keyword: string, location?: string): string {
+    const normalizedKeyword = keyword.trim().toLowerCase();
+    const normalizedLocation = (location ?? '').trim().toLowerCase();
+    return `serp:kw:${normalizedKeyword}:${normalizedLocation}`;
+  }
+
+  private async runQuery(
+    query: string,
+    location?: string,
+    numResults: number = RESULTS_PER_QUERY,
+  ): Promise<SerpResult[]> {
     const apiKey = this.config.get<string>('SERP_API_KEY');
     if (!apiKey) {
       throw new Error('SERP_API_KEY is not configured');
@@ -51,7 +90,14 @@ export class SerpService {
     url.searchParams.set('engine', 'google');
     url.searchParams.set('q', query);
     url.searchParams.set('api_key', apiKey);
-    url.searchParams.set('num', String(RESULTS_PER_QUERY));
+    url.searchParams.set('num', String(numResults));
+    // Without an explicit locale, generic keyword queries can come back
+    // matching loosely on individual words instead of the intended phrase.
+    url.searchParams.set('hl', 'en');
+    url.searchParams.set('gl', 'us');
+    if (location) {
+      url.searchParams.set('location', location);
+    }
 
     const res = await fetch(url.toString());
     if (!res.ok) {
@@ -63,7 +109,7 @@ export class SerpService {
     const data = await res.json();
     const organic: any[] = data.organic_results ?? [];
 
-    return organic.slice(0, RESULTS_PER_QUERY).map((r) => ({
+    return organic.slice(0, numResults).map((r) => ({
       title: r.title ?? '',
       link: r.link ?? '',
       snippet: r.snippet ?? '',

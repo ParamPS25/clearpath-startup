@@ -36,3 +36,23 @@ export interface CompareResponse {
 export function isReportResult(result: CompareResult): result is ValidationReport {
   return !("error" in result);
 }
+
+export interface RankedResult {
+  position: number;
+  title: string;
+  url: string;
+}
+
+export interface KeywordRankResult {
+  keyword: string;
+  position: number | null;
+  topCompetitors: RankedResult[];
+  explanation: string;
+}
+
+export interface SeoRankReport {
+  businessName: string;
+  domain: string;
+  results: KeywordRankResult[];
+  summary: string;
+}

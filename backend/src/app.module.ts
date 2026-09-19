@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { HealthModule } from './health/health.module';
 import { ValidateModule } from './validate/validate.module';
+import { SeoModule } from './seo/seo.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ValidateModule } from './validate/validate.module';
     }),
     HealthModule,
     ValidateModule,
+    SeoModule,
   ],
   controllers: [AppController],
   providers: [AppService],
