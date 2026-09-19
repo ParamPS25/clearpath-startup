@@ -63,8 +63,9 @@ Commit at the end of each phase with a message like `phase-2: SERP + LLM core pi
 ```
 # Phase 1+
 SERP_API_KEY=
-LLM_API_KEY=
-LLM_PROVIDER=openai   # or anthropic
+LLM_PROVIDER=gemini   # or groq
+GEMINI_API_KEY=
+GROQ_API_KEY=
 
 # Phase 3+
 MONGODB_URI=
