@@ -1,4 +1,4 @@
-# Startup Name & Market Validator
+# Clearpath — Startup Name & Market Validator
 
 ## What this is
 
@@ -14,9 +14,28 @@ Output is a single combined verdict (e.g. "Low name risk, moderately crowded mar
 direct competitors found") backed by cited sources, generated in seconds instead of 20+
 minutes of manual searching.
 
-**Core pipeline:** user input → backend orchestrator → 2 parallel SERP API calls (name
-search, market search) → LLM synthesis (structured JSON, scored, cited) → cache in
-MongoDB/Redis → rendered report on the frontend.
+**Core pipeline:** user input → backend orchestrator → parallel SERP API calls → LLM
+synthesis (structured JSON, scored, cited) → cache in MongoDB/Redis → rendered report on
+the frontend. Anything numeric or factual (scores, rank positions, who's above whom) is
+computed deterministically in code from the raw search results — the LLM is only ever
+asked to write the prose explanation around numbers it's handed, never to invent them.
+
+---
+
+## Status
+
+Phases 1–6 below are done, plus two things not in the original phase plan:
+
+- **`/seo-check`** (`POST /seo-rank`) — see the write-up under Phase 7.5. Built ahead of
+  PDF export because it was judged more valuable for the demo.
+- **A real landing page + site header** (`/`, with nav to Validate / Compare / SEO
+  Check) — folded into the frontend work rather than left for Phase 8's polish pass.
+
+**Phase 7 (PDF export) is deprioritized for now** — not started, revisit if time allows
+after the features in Phase 7.6.
+
+Currently in progress: **Phase 7.6 — search interest trend + domain/handle
+availability** (see below).
 
 ---
 
@@ -81,7 +100,7 @@ RATE_LIMIT_MAX_REQUESTS=
 
 ---
 
-## Phase 1 — Foundation & environment setup
+## Phase 1 — Foundation & environment setup *(done)*
 
 **Goal:** a running skeleton, deployed early, before any real feature work.
 
@@ -102,7 +121,7 @@ RATE_LIMIT_MAX_REQUESTS=
 
 ---
 
-## Phase 2 — Core pipeline: SERP + LLM synthesis (backend only)
+## Phase 2 — Core pipeline: SERP + LLM synthesis (backend only) *(done)*
 
 **Goal:** prove the hard part works before building any UI around it.
 
@@ -150,7 +169,7 @@ RATE_LIMIT_MAX_REQUESTS=
 
 ---
 
-## Phase 3 — Data layer: MongoDB persistence + Redis caching
+## Phase 3 — Data layer: MongoDB persistence + Redis caching *(done)*
 
 **Goal:** stop re-spending API quota and start persisting reports.
 
@@ -174,7 +193,7 @@ RATE_LIMIT_MAX_REQUESTS=
 
 ---
 
-## Phase 4 — Frontend MVP
+## Phase 4 — Frontend MVP *(done)*
 
 **Goal:** an actual usable product, not just an API.
 
@@ -199,7 +218,7 @@ RATE_LIMIT_MAX_REQUESTS=
 
 ---
 
-## Phase 5 — Shareable report links & history
+## Phase 5 — Shareable report links & history *(done)*
 
 **Goal:** turn a one-off lookup into something judges (or you) can revisit.
 
@@ -216,9 +235,13 @@ RATE_LIMIT_MAX_REQUESTS=
       incognito/private window renders the same report correctly.
 - [ ] An invalid/nonexistent report ID shows a clean "not found" state, not a crash.
 
+*Deviation: the optional `/reports` list page was skipped (explicitly optional in this
+doc). Saved reports are cached indefinitely on the frontend once fetched, since a report
+is immutable once created.*
+
 ---
 
-## Phase 6 — Differentiator: comparison mode
+## Phase 6 — Differentiator: comparison mode *(done)*
 
 **Goal:** the headline "wow" feature — turn a lookup tool into a decision tool.
 
@@ -236,9 +259,13 @@ RATE_LIMIT_MAX_REQUESTS=
 - [ ] The recommendation logic is visibly grounded in the actual scores shown, not a
       generic statement.
 
+*Deviation: the recommendation is deterministic (highest `nameClashScore`, tie-broken by
+fewer competitors), not another LLM call — cheaper, faster, and can't drift from the
+numbers actually shown on the cards.*
+
 ---
 
-## Phase 7 — PDF export
+## Phase 7 — PDF export *(deprioritized, not started)*
 
 **Goal:** make the report feel like a deliverable artifact, not just a webpage.
 
@@ -252,6 +279,103 @@ RATE_LIMIT_MAX_REQUESTS=
 **Acceptance criteria (manual test):**
 - [ ] Downloaded PDF opens correctly and is legible, matching the on-screen report
       content.
+
+---
+
+## Phase 7.5 — SEO rank checking *(done)*
+
+**Goal:** answer "now that I've launched, where do I actually show up on Google for my
+target keywords, and who's outranking me?" — the future phase originally sketched at the
+bottom of this doc, picked up ahead of PDF export.
+
+**Scope:**
+- `POST /seo-rank` — body `{ businessName, domain, keywords: string[] (1-10), location? }`.
+- For each keyword: a real SerpApi search (up to 20 results), then **in code, not the
+  LLM** — find the domain's position in those results (or `null` if not present) and the
+  competitors ranking above it. The LLM only writes a one-line explanation per keyword
+  plus an overall summary, grounded in the same titles/urls it's handed, and is told not
+  to invent authority/traffic numbers it wasn't given.
+- Frontend `/seo-check` page: business name + domain + keyword list (+ optional
+  location), results as color-coded rank badges with an expandable "who's ranking above
+  you" list.
+
+**Acceptance criteria (manual test):**
+- [x] A well-known domain with a keyword it should plausibly rank for shows a real
+      position with a real competitor list above it.
+- [x] A domain not found in the checked results shows `null`/"not in top 20" plainly,
+      instead of a guessed position.
+- [x] The explanation text is traceable to the actual titles/urls shown, not generic SEO
+      advice.
+
+**Bugs found and fixed while building this** (both verified against live SerpApi calls
+before/after): generic keyword queries without an explicit `hl`/`gl` locale matched
+loosely on individual words instead of the phrase (e.g. "note taking app" surfaced a CNBC
+article and a YouTube video, matching only on unrelated senses of "taking"); even with
+locale set, some phrases still did this until the keyword was wrapped in an exact-phrase
+quote (e.g. "issue tracking software" surfaced fitness-tracker results until quoted).
+
+---
+
+## Phase 7.6 — Search interest trend + domain/handle availability *(in progress)*
+
+**Goal:** two small, high-signal additions to the existing `/validate` report — both
+computed from real data, not LLM guesses.
+
+### 1. Search interest trend
+
+Show whether interest in the candidate name is rising, flat, or declining over the last
+12 months, using SerpApi's `google_trends` engine (`data_type=TIMESERIES`,
+`date=today 12-m`) — same API, same account, just a different `engine` param, so this
+doesn't introduce a new integration pattern.
+
+- Weekly interest-over-time points (0–100 relative scale) for the name, cached like other
+  SerpApi calls.
+- Direction is computed deterministically: compare the average of the earliest 3 complete
+  weeks vs. the most recent 3 complete weeks (excluding the current, `partial_data` week)
+  against a threshold — `rising` / `declining` / `flat`. No LLM involved in the number.
+- **Verified real behavior to design around:** most invented/candidate startup names have
+  *no* Trends data at all (Google Trends only has data for terms people already search).
+  This is the correct, honest outcome for a brand-new name, not a bug — the UI needs an
+  explicit "not enough search volume to show a trend" state, not just three options.
+- Attached to the report as `searchTrend` (computed after LLM synthesis, alongside the
+  existing bolted-on `id` field — never part of the LLM-validated schema).
+- Frontend: a small sparkline + a direction badge next to the verdict on both the single
+  report and comparison cards.
+
+**Acceptance criteria (manual test):**
+- [ ] A well-known, actively-searched name shows a real 12-month sparkline and a
+      direction that matches what a manual Google Trends check shows.
+- [ ] A made-up name shows the explicit "not enough data" state, not a fabricated flat
+      line.
+
+### 2. Domain & social handle availability
+
+Complements the name clash score directly: a company search coming back empty doesn't
+mean the domain or handle is actually free.
+
+- **Domain (`.com` only for now):** [RDAP](https://rdap.org) lookup — `200` = registered,
+  `404` = available, anything else = unknown (shown as such, never guessed). No API key
+  needed.
+  - **Verified limitation, scoped around rather than shipped broken:** RDAP's public
+    bootstrap redirector gives false "available" results for `.io`/`.co`/`.so` — it
+    reported `github.io`, `vercel.co`, and `notion.so` as available when they obviously
+    aren't. Only `.com` (via Verisign's RDAP, confirmed reliable) is checked in this
+    phase; other TLDs are a future extension once a trustworthy free source is found.
+- **GitHub handle:** `GET api.github.com/users/<handle>` — `200` = taken, `404` =
+  available. Free, no key, reliable.
+  - **Twitter/X, Instagram, TikTok are explicitly out of scope for now** — there is no
+    reliable free way to check handle availability on them (no free API; scraping their
+    profile pages is blocked/unreliable and would risk showing a wrong answer live in a
+    demo, which is worse than not showing one).
+- Attached to the report as `availability` — same bolted-on-after-synthesis pattern as
+  `searchTrend` and `id`.
+- Frontend: two small badges (domain, GitHub handle) near the name clash score —
+  Available / Taken / Unknown, never a false positive presented as fact.
+
+**Acceptance criteria (manual test):**
+- [ ] A well-known taken name shows both domain and GitHub handle as taken.
+- [ ] A genuinely available invented name shows both as available.
+- [ ] An RDAP/GitHub API failure shows "unknown," not a silently wrong answer.
 
 ---
 
@@ -305,27 +429,6 @@ Once the product is solid and demo-ready locally, add a deployment phase coverin
 frontend (e.g. Vercel), backend (e.g. Render/Railway), MongoDB Atlas, and Redis Cloud —
 plus a check that the live deployed link works from a device that never touched the local
 dev environment. Not scoped in detail here since it's deliberately deferred.
-
----
-
-## Future phase (not started): post-launch SEO ranking check
-
-A natural companion feature once the core product is solid: while the current tool
-answers "is this name/market a good bet *before* I commit?", this would answer "now that
-I've launched, where do I actually show up on Google for my target keywords, and who's
-outranking me?"
-
-Rough shape (to be scoped properly when picked up):
-- Input: business name + a short list of target keywords (+ location, if relevant for
-  local pack results).
-- Reuses the existing orchestrator/synthesis pattern — SERP queries per keyword,
-  aggregated, then synthesized into a simple ranking summary (current position,
-  who's above you, and a one-line explanation of why).
-- Could plug into the same `reports` collection with a different report `type`, or a
-  separate collection if the shape diverges too much — decide when actually scoping it.
-
-Not scoped in detail here since it's deliberately deferred until the current phases are
-done.
 
 ---
 
