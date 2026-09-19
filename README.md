@@ -30,12 +30,10 @@ Phases 1–6 below are done, plus two things not in the original phase plan:
   PDF export because it was judged more valuable for the demo.
 - **A real landing page + site header** (`/`, with nav to Validate / Compare / SEO
   Check) — folded into the frontend work rather than left for Phase 8's polish pass.
+- **Search interest trend** (Phase 7.6, see below) — a `searchTrend` field on every
+  report showing 12-month Google Trends direction for the name.
 
-**Phase 7 (PDF export) is deprioritized for now** — not started, revisit if time allows
-after the features in Phase 7.6.
-
-Currently in progress: **Phase 7.6 — search interest trend + domain/handle
-availability** (see below).
+**Phase 7 (PDF export) is deprioritized for now** — not started.
 
 ---
 
@@ -316,7 +314,7 @@ quote (e.g. "issue tracking software" surfaced fitness-tracker results until quo
 
 ---
 
-## Phase 7.6 — Search interest trend *(in progress)*
+## Phase 7.6 — Search interest trend *(done)*
 
 **Goal:** a small, high-signal addition to the existing `/validate` report, computed from
 real data, not an LLM guess.
@@ -344,9 +342,9 @@ doesn't introduce a new integration pattern.
   report and comparison cards.
 
 **Acceptance criteria (manual test):**
-- [ ] A well-known, actively-searched name shows a real 12-month sparkline and a
+- [x] A well-known, actively-searched name shows a real 12-month sparkline and a
       direction that matches what a manual Google Trends check shows.
-- [ ] A made-up name shows the explicit "not enough data" state, not a fabricated flat
+- [x] A made-up name shows the explicit "not enough data" state, not a fabricated flat
       line.
 
 *Note on the dropped domain/handle idea, kept for whoever picks it up later: RDAP
