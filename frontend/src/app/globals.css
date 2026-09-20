@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Manual dark mode: `dark:` utilities now key off a `.dark` class on <html>
+   (toggled by ThemeToggle + the inline script in layout.tsx) instead of
+   prefers-color-scheme. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -9,6 +14,11 @@
     "Liberation Mono", monospace;
 }
 
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -16,13 +26,6 @@
   --font-mono: var(--font-mono);
   --font-display: var(--font-display), var(--font-sans);
   --font-sans: var(--font-sans);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {

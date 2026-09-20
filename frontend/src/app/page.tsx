@@ -1,12 +1,6 @@
 import Link from "next/link";
 import HeroSearch from "@/components/HeroSearch";
-import {
-  ChartIcon,
-  CompareIcon,
-  RankIcon,
-  SearchIcon,
-  TrendIcon,
-} from "@/components/icons";
+import { ChartIcon, RankIcon, SearchIcon, TrendIcon } from "@/components/icons";
 import Image from "next/image";
 
 const HERO_TAGS = [
@@ -18,28 +12,32 @@ const HERO_TAGS = [
 
 const FEATURES = [
   {
-    icon: SearchIcon,
+    n: "01",
     title: "Check a name",
     body: "See if it clashes with existing companies, apps, or trademarks — and whether search interest in it is rising or fading.",
     href: "/validate",
+    image: "/trends-block2.png",
   },
   {
-    icon: ChartIcon,
+    n: "02",
     title: "Market landscape",
     body: "Real competitors surfaced from live search results, with every claim cited back to its source — nothing invented.",
     href: "/validate",
+    image: "/market-landscape-block.png",
   },
   {
-    icon: CompareIcon,
+    n: "03",
     title: "Compare candidates",
     body: "Run two or three names side by side and see which one wins, with the reasoning shown plainly.",
     href: "/compare",
+    image: "/compare3-block.png",
   },
   {
-    icon: RankIcon,
+    n: "04",
     title: "SEO rank check",
     body: "See where a domain ranks for the keywords that matter, and exactly who's outranking it.",
     href: "/seo-check",
+    image: "/seo-blockk.png",
   },
 ];
 
@@ -61,6 +59,8 @@ const STEPS = [
   },
 ];
 
+const HOW_IT_WORKS_BG_IMAGE = "/landscape.png";
+
 export default function LandingPage() {
   return (
     <main className="flex flex-col items-center">
@@ -72,7 +72,7 @@ export default function LandingPage() {
           <div className="h-105 w-180 translate-y-[-40%] rounded-full bg-blue-500/10 dark:bg-blue-500/15 blur-3xl" />
         </div>
 
-        <div className="mx-auto max-w-5xl px-6 pt-16 pb-16 grid gap-12 lg:grid-cols-2 lg:items-center">
+        <div className="mx-auto max-w-6xl px-6 pt-16 pb-16 grid gap-12 lg:grid-cols-2 lg:items-center">
           <div className="flex flex-col items-center lg:items-start text-center lg:text-left gap-5">
             <span className="text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
               Brand intelligence for founders
@@ -115,34 +115,54 @@ export default function LandingPage() {
       </section>
 
       <section className="w-full border-t border-gray-200 dark:border-gray-800">
-        <div className="mx-auto max-w-5xl px-6 py-16">
+        <div className="mx-auto max-w-6xl px-6 py-16">
           <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-6">
             What it checks
           </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-5 sm:grid-cols-2">
             {FEATURES.map((f) => (
               <Link
                 key={f.title}
                 href={f.href}
-                className="group flex flex-col gap-3 rounded-xl border border-gray-200 dark:border-gray-800 p-5 hover:border-blue-400 dark:hover:border-blue-700 hover:shadow-sm transition-all"
+                className="group flex flex-col overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/40 hover:border-blue-400 dark:hover:border-blue-700 hover:shadow-md transition-all"
               >
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
-                  <f.icon className="h-5 w-5" />
+                <div className="flex flex-col gap-2 p-5">
+                  <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
+                    {f.n}
+                  </span>
+                  <h2 className="font-display text-xl font-semibold group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    {f.title}
+                  </h2>
+                  <p className="text-md text-gray-600 dark:text-gray-400">{f.body}</p>
                 </div>
-                <h3 className="font-semibold group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                  {f.title}
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {f.body}
-                </p>
+                <div className="relative w-full aspect-16/10 overflow-hidden bg-gray-100 dark:bg-gray-900">
+                  <Image
+                    src={f.image}
+                    alt={`${f.title} preview`}
+                    fill
+                    sizes="(min-width: 640px) 50vw, 100vw"
+                    className="object-cover object-top transition-transform duration-300 group-hover:scale-[1.03]"
+                  />
+                </div>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="w-full border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950/50">
-        <div className="mx-auto max-w-5xl px-6 py-16">
+      <section className="relative w-full overflow-hidden border-t border-gray-200 dark:border-gray-800">
+        <div aria-hidden className="absolute inset-0 -z-10">
+          <Image
+            src={HOW_IT_WORKS_BG_IMAGE}
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover"
+          />
+          <div className="absolute inset-0" />
+        </div>
+
+        <div className="mx-auto max-w-6xl px-6 py-16">
           <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-6">
             How it works
           </h2>
@@ -153,9 +173,7 @@ export default function LandingPage() {
                   {s.n}
                 </span>
                 <h3 className="font-semibold">{s.title}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {s.body}
-                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{s.body}</p>
               </div>
             ))}
           </div>

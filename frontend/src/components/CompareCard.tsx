@@ -23,12 +23,19 @@ export function CompareCard({
           : "border-gray-200 dark:border-gray-800"
       }`}
     >
-      {isRecommended && (
+      {/* {isRecommended && (
         <span className="self-start rounded-full bg-blue-600 text-white text-xs font-medium px-2 py-0.5">
           Recommended
         </span>
-      )}
-      <h3 className="font-semibold text-lg truncate">{report.name}</h3>
+      )} */}
+      <div className="flex items-center justify-between">
+        <h3 className="font-semibold text-lg truncate">{report.name}</h3>
+        {isRecommended && (
+          <span className="self-start rounded-full bg-blue-600 text-white text-xs font-medium px-2 py-0.5">
+            Recommended
+          </span>
+        )}
+      </div>
       <ScoreBadge score={report.nameClashScore} />
       {report.searchTrend && <TrendBadge trend={report.searchTrend} />}
       <p className="text-sm text-gray-600 dark:text-gray-400">{report.overallVerdict}</p>

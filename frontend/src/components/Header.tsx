@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import LogoMark from "./Logo";
+import ThemeToggle from "./ThemeToggle";
 
 const NAV_LINKS = [
   { href: "/validate", label: "Check Name" },
@@ -15,7 +16,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-black/60 backdrop-blur supports-backdrop-filter:bg-white/60">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
         <Link
           href="/"
           className="flex items-center gap-1 shrink-0 hover:opacity-80 transition-opacity"
@@ -41,6 +42,7 @@ export default function Header() {
               </Link>
             );
           })}
+          <ThemeToggle />
         </nav>
       </div>
     </header>

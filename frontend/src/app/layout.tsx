@@ -21,9 +21,21 @@ export const metadata: Metadata = {
     "Check name clash risk, market crowding, and search rankings for a startup name before you commit.",
 };
 
+// Runs before paint so the page never flashes the wrong theme on load.
+const THEME_INIT_SCRIPT = `
+  try {
+    var stored = localStorage.getItem('theme');
+    var isDark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.classList.toggle('dark', isDark);
+  } catch (e) {}
+`;
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${playfairDisplay.variable} ${manrope.variable} h-full antialiased`}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="min-h-full flex flex-col">
         <Header />
         {children}
