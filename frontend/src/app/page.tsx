@@ -77,10 +77,10 @@ export default function LandingPage() {
             <span className="text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
               Brand intelligence for founders
             </span>
-            <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight text-balance">
-              Before you build the<span className="text-blue-600 dark:text-blue-400"> brand</span>, know what you are building on. 
+            <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-normal text-balance leading-[1.1]">
+              Before you build the<span className="text-blue-600 dark:text-blue-400"> brand</span>, know what you are building on.
             </h1>
-            <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400">
+            <p className="font-sans text-base sm:text-lg text-gray-600 dark:text-gray-400 text-balance">
               Clearpath researches your name accross the web for name clashes, competitors, and
               demand, then gives you one cited, scored verdict - under a minute.
             </p>
