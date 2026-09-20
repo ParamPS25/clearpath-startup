@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope, Playfair_Display } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import Header from "@/components/Header";
 import "./globals.css";
 
@@ -39,6 +40,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
         <Header />
         {children}
+        <SpeedInsights />
       </body>
     </html>
   );
