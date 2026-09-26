@@ -90,6 +90,7 @@ REDIS_URL=
 
 # Phase 4+ (frontend)
 NEXT_PUBLIC_API_BASE_URL=
+NEXT_PUBLIC_SITE_URL=      # for OG/Twitter image URLs — set to the real deployed URL once live
 
 # Phase 8+
 RATE_LIMIT_WINDOW_MS=

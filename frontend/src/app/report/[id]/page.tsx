@@ -1,13 +1,33 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import ReportView from "@/components/ReportView";
 import { getReport, NotFoundError } from "@/lib/api";
 import { ValidationReport } from "@/lib/types";
 
-export default async function ReportPage({
-  params,
-}: {
+type ReportPageProps = {
   params: Promise<{ id: string }>;
-}) {
+};
+
+export async function generateMetadata({ params }: ReportPageProps): Promise<Metadata> {
+  const { id } = await params;
+
+  try {
+    // Same cached fetch the page body below makes — Next dedupes identical
+    // fetch calls within one request, so this doesn't cost a second round trip.
+    const report = await getReport(id);
+    const title = `${report.name} - validation report`;
+    return {
+      title,
+      description: report.overallVerdict,
+      openGraph: { title: `${title} - Clearpath`, description: report.overallVerdict },
+      twitter: { title: `${title} - Clearpath`, description: report.overallVerdict },
+    };
+  } catch {
+    return { title: "Report not found" };
+  }
+}
+
+export default async function ReportPage({ params }: ReportPageProps) {
   const { id } = await params;
 
   let report: ValidationReport | null = null;

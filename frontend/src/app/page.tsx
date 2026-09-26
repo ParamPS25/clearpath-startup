@@ -1,5 +1,6 @@
 import Link from "next/link";
 import HeroSearch from "@/components/HeroSearch";
+import Footer from "@/components/Footer";
 import { ChartIcon, RankIcon, SearchIcon, TrendIcon } from "@/components/icons";
 import Image from "next/image";
 
@@ -41,28 +42,9 @@ const FEATURES = [
   },
 ];
 
-const STEPS = [
-  {
-    n: "01",
-    title: "Enter a name",
-    body: "Add an optional one-line pitch so the search knows what market to look at.",
-  },
-  {
-    n: "02",
-    title: "We search and synthesize",
-    body: "Searches run in parallel, and the raw results get turned into a scored, structured report.",
-  },
-  {
-    n: "03",
-    title: "Get a verdict",
-    body: "A single, cited answer — not a pile of tabs to read through yourself.",
-  },
-];
-
-const HOW_IT_WORKS_BG_IMAGE = "/landscape.png";
-
 export default function LandingPage() {
   return (
+    <>
     <main className="flex flex-col items-center">
       <section className="relative w-full overflow-hidden">
         <div
@@ -114,11 +96,17 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="w-full border-t border-gray-200 dark:border-gray-800">
+      <section className="relative w-full">
         <div className="mx-auto max-w-6xl px-6 py-16">
-          <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-6">
-            What it checks
-          </h2>
+          <div className="mb-10 max-w-xl">
+            <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-balance">
+              What it checks
+            </h2>
+            <p className="mt-2 text-gray-600 dark:text-gray-400 text-balance">
+              One name, four real signals — pulled from live search results and cited
+              back to their source, not guessed by a model.
+            </p>
+          </div>
           <div className="grid gap-5 sm:grid-cols-2">
             {FEATURES.map((f) => (
               <Link
@@ -130,9 +118,9 @@ export default function LandingPage() {
                   <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
                     {f.n}
                   </span>
-                  <h2 className="font-display text-xl font-semibold group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  <h3 className="font-display text-xl font-semibold group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                     {f.title}
-                  </h2>
+                  </h3>
                   <p className="text-md text-gray-600 dark:text-gray-400">{f.body}</p>
                 </div>
                 <div className="relative w-full aspect-16/10 overflow-hidden bg-gray-100 dark:bg-gray-900">
@@ -149,36 +137,8 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-      <section className="relative w-full overflow-hidden border-t border-gray-200 dark:border-gray-800">
-        <div aria-hidden className="absolute inset-0 -z-10">
-          <Image
-            src={HOW_IT_WORKS_BG_IMAGE}
-            alt=""
-            fill
-            sizes="100vw"
-            className="object-cover"
-          />
-          <div className="absolute inset-0" />
-        </div>
-
-        <div className="mx-auto max-w-6xl px-6 py-16">
-          <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-6">
-            How it works
-          </h2>
-          <div className="grid gap-8 sm:grid-cols-3">
-            {STEPS.map((s) => (
-              <div key={s.n} className="flex flex-col gap-2">
-                <span className="text-3xl font-semibold text-gray-300 dark:text-gray-700">
-                  {s.n}
-                </span>
-                <h3 className="font-semibold">{s.title}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{s.body}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
     </main>
+    <Footer />
+    </>
   );
 }

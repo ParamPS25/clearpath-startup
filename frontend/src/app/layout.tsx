@@ -16,10 +16,45 @@ const manrope = Manrope({
   weight: ["400", "500", "600", "700", "800"],
 });
 
+const SITE_NAME = "Clearpath";
+const DEFAULT_TITLE = "Clearpath - Startup Name & Market Validator";
+const DEFAULT_DESCRIPTION =
+  "Check name clash risk, market crowding, search demand, and SEO rankings for a startup name before you commit.";
+const OG_IMAGE = { url: "/clearpath.png", width: 2172, height: 724, alt: SITE_NAME };
+
 export const metadata: Metadata = {
-  title: "Clearpath — Startup Name & Market Validator",
-  description:
-    "Check name clash risk, market crowding, and search rankings for a startup name before you commit.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  title: {
+    default: DEFAULT_TITLE,
+    template: `%s - ${SITE_NAME}`,
+  },
+  description: DEFAULT_DESCRIPTION,
+  applicationName: SITE_NAME,
+  keywords: [
+    "startup name validator",
+    "brand name check",
+    "name clash checker",
+    "market research tool",
+    "SEO rank checker",
+  ],
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    images: [OG_IMAGE],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    images: [OG_IMAGE.url],
+  },
 };
 
 // Runs before paint so the page never flashes the wrong theme on load.
