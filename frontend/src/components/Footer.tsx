@@ -53,7 +53,7 @@ export default function Footer() {
                 key={s.n}
                 className="relative z-10 flex flex-col items-center gap-3"
               >
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-900/5 text-sm font-bold text-gray-700 ring-1 ring-gray-900/10 dark:bg-white/10 dark:text-gray-200 dark:ring-white/20">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 text-sm font-bold text-gray-700 ring-1 ring-gray-900/10 dark:bg-neutral-950 dark:text-gray-200 dark:ring-white/20">
                   {s.n.replace(/^0/, "")}
                 </span>
                 <h3 className="font-display text-lg font-semibold">{s.title}</h3>
