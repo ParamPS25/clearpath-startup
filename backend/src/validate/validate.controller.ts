@@ -5,6 +5,7 @@ import {
   HttpStatus,
   Logger,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { SynthesisService } from '../synthesis/synthesis.service';
 import { ReportsService } from '../reports/reports.service';
@@ -12,10 +13,14 @@ import { EnrichedValidationReport } from '../synthesis/schema';
 import { ValidateRequestDto } from './dto/validate-request.dto';
 import { CompareRequestDto } from './dto/compare-request.dto';
 import { buildRecommendation } from './recommendation';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CurrentUser } from '../auth/current-user.decorator';
+import { AccessTokenPayload } from '../auth/auth.service';
 
 type ReportWithId = EnrichedValidationReport & { id?: string };
 
 @Controller('validate')
+@UseGuards(JwtAuthGuard)
 export class ValidateController {
   private readonly logger = new Logger(ValidateController.name);
 
@@ -25,9 +30,12 @@ export class ValidateController {
   ) {}
 
   @Post()
-  async validate(@Body() dto: ValidateRequestDto) {
+  async validate(
+    @Body() dto: ValidateRequestDto,
+    @CurrentUser() user: AccessTokenPayload,
+  ) {
     try {
-      return await this.validateAndPersist(dto.name, dto.pitch);
+      return await this.validateAndPersist(dto.name, dto.pitch, user.sub);
     } catch (err) {
       throw new HttpException(
         {
@@ -40,12 +48,16 @@ export class ValidateController {
   }
 
   @Post('compare')
-  async compare(@Body() dto: CompareRequestDto) {
+  async compare(
+    @Body() dto: CompareRequestDto,
+    @CurrentUser() user: AccessTokenPayload,
+  ) {
     const settled = await Promise.allSettled(
       dto.candidates.map((candidate) =>
         this.validateAndPersist(
           candidate.name,
           candidate.pitch || dto.sharedPitch,
+          user.sub,
         ),
       ),
     );
@@ -74,13 +86,19 @@ export class ValidateController {
 
   private async validateAndPersist(
     name: string,
-    pitch?: string,
+    pitch: string | undefined,
+    userId: string,
   ): Promise<ReportWithId> {
     const report = await this.synthesis.validate(name, pitch);
 
     let id: string | undefined;
     try {
-      const doc = await this.reports.create({ name, pitch, response: report });
+      const doc = await this.reports.create({
+        name,
+        pitch,
+        response: report,
+        createdBy: userId,
+      });
       id = doc._id.toString();
     } catch (err) {
       this.logger.warn(

@@ -4,11 +4,14 @@ import {
   HttpException,
   HttpStatus,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { SeoService } from './seo.service';
 import { SeoRankRequestDto } from './dto/seo-rank-request.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('seo-rank')
+@UseGuards(JwtAuthGuard)
 export class SeoController {
   constructor(private readonly seo: SeoService) {}
 

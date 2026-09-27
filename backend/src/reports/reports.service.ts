@@ -14,6 +14,7 @@ export class ReportsService {
     name: string;
     pitch?: string;
     response: EnrichedValidationReport;
+    createdBy?: string;
   }) {
     return this.model.create(data);
   }

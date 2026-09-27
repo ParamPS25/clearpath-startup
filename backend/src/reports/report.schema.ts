@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { EnrichedValidationReport } from '../synthesis/schema';
 
 @Schema({
@@ -15,6 +15,9 @@ export class Report {
 
   @Prop({ type: Object, required: true })
   response: EnrichedValidationReport;
+
+  @Prop({ type: Types.ObjectId, ref: 'User' })
+  createdBy?: Types.ObjectId;
 
   createdAt?: Date;
 }
