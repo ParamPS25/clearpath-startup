@@ -1,11 +1,11 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import ValidateForm from "@/components/ValidateForm";
 import ReportView from "@/components/ReportView";
 import ShareLink from "@/components/ShareLink";
-import { validateStartup, ApiError } from "@/lib/api";
+import { validateStartup, ApiError, UnauthorizedError } from "@/lib/api";
 import { ValidationReport } from "@/lib/types";
 
 type State =
@@ -15,6 +15,7 @@ type State =
   | { phase: "error"; message: string };
 
 function ValidatePageContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const initialName = searchParams.get("name") ?? "";
 
@@ -30,6 +31,10 @@ function ValidatePageContent() {
       const report = await validateStartup(name, pitch);
       setState({ phase: "success", report });
     } catch (err) {
+      if (err instanceof UnauthorizedError) {
+        router.push("/login?callbackUrl=/validate");
+        return;
+      }
       const message =
         err instanceof ApiError
           ? err.message

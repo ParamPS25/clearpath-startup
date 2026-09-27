@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import CompareForm from "@/components/CompareForm";
 import { CompareCard, CompareErrorCard } from "@/components/CompareCard";
-import { compareStartups, ApiError } from "@/lib/api";
+import { compareStartups, ApiError, UnauthorizedError } from "@/lib/api";
 import { CandidateInput, CompareResponse, isReportResult } from "@/lib/types";
 
 type State =
@@ -13,6 +14,7 @@ type State =
   | { phase: "error"; message: string };
 
 export default function ComparePage() {
+  const router = useRouter();
   const [state, setState] = useState<State>({ phase: "idle" });
   const [lastInput, setLastInput] = useState<{
     candidates: CandidateInput[];
@@ -26,6 +28,10 @@ export default function ComparePage() {
       const data = await compareStartups(candidates, sharedPitch);
       setState({ phase: "success", data });
     } catch (err) {
+      if (err instanceof UnauthorizedError) {
+        router.push("/login?callbackUrl=/compare");
+        return;
+      }
       const message =
         err instanceof ApiError
           ? err.message

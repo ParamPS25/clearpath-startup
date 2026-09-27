@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import SeoForm from "@/components/SeoForm";
 import SeoResultCard from "@/components/SeoResultCard";
-import { checkSeoRankings, ApiError } from "@/lib/api";
+import { checkSeoRankings, ApiError, UnauthorizedError } from "@/lib/api";
 import { SeoRankReport } from "@/lib/types";
 
 type State =
@@ -20,6 +21,7 @@ interface LastInput {
 }
 
 export default function SeoCheckPage() {
+  const router = useRouter();
   const [state, setState] = useState<State>({ phase: "idle" });
   const [lastInput, setLastInput] = useState<LastInput | null>(null);
 
@@ -35,6 +37,10 @@ export default function SeoCheckPage() {
       const report = await checkSeoRankings(businessName, domain, keywords, location);
       setState({ phase: "success", report });
     } catch (err) {
+      if (err instanceof UnauthorizedError) {
+        router.push("/login?callbackUrl=/seo-check");
+        return;
+      }
       const message =
         err instanceof ApiError
           ? err.message

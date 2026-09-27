@@ -1,3 +1,4 @@
+import { getSession } from "next-auth/react";
 import { CandidateInput, CompareResponse, SeoRankReport, ValidationReport } from "./types";
 
 const API_BASE_URL =
@@ -9,6 +10,7 @@ const SEO_TIMEOUT_MS = 90_000;
 
 export class ApiError extends Error {}
 export class NotFoundError extends ApiError {}
+export class UnauthorizedError extends ApiError {}
 
 async function fetchWithTimeout(
   path: string,
@@ -37,11 +39,43 @@ async function fetchWithTimeout(
   }
 }
 
+// Wraps fetchWithTimeout with the current session's access token - used for
+// the endpoints the backend now guards (/validate, /validate/compare,
+// /seo-rank). The NextAuth jwt callback already keeps the token fresh, so a
+// 401 here means the session is genuinely gone, not just stale.
+async function authorizedFetch(
+  path: string,
+  init?: RequestInit,
+  timeoutMs: number = REQUEST_TIMEOUT_MS,
+): Promise<Response> {
+  const session = await getSession();
+
+  const res = await fetchWithTimeout(
+    path,
+    {
+      ...init,
+      headers: {
+        ...init?.headers,
+        ...(session?.accessToken
+          ? { Authorization: `Bearer ${session.accessToken}` }
+          : {}),
+      },
+    },
+    timeoutMs,
+  );
+
+  if (res.status === 401) {
+    throw new UnauthorizedError("You need to log in to do that.");
+  }
+
+  return res;
+}
+
 export async function validateStartup(
   name: string,
   pitch?: string,
 ): Promise<ValidationReport> {
-  const res = await fetchWithTimeout("/validate", {
+  const res = await authorizedFetch("/validate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name, pitch: pitch || undefined }),
@@ -61,7 +95,7 @@ export async function compareStartups(
   candidates: CandidateInput[],
   sharedPitch?: string,
 ): Promise<CompareResponse> {
-  const res = await fetchWithTimeout(
+  const res = await authorizedFetch(
     "/validate/compare",
     {
       method: "POST",
@@ -90,7 +124,7 @@ export async function checkSeoRankings(
   keywords: string[],
   location?: string,
 ): Promise<SeoRankReport> {
-  const res = await fetchWithTimeout(
+  const res = await authorizedFetch(
     "/seo-rank",
     {
       method: "POST",
