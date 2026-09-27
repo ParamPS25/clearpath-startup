@@ -75,7 +75,7 @@ export default function Footer() {
 
       <div className="relative mx-auto flex max-w-6xl flex-col gap-6 border-t border-gray-200 px-6 py-10 dark:border-white/10 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1">
-          <span className="text-lg font-semibold tracking-tight">
+          <span className="font-display text-lg font-semibold tracking-wide text-balance">
             Clearpath
           </span>
           <p className="text-sm text-gray-600 dark:text-gray-400 max-w-xs">
