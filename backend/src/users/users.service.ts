@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { User, UserDocument } from './user.schema';
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
+
   constructor(
     @InjectModel(User.name) private readonly model: Model<UserDocument>,
   ) {}
@@ -22,12 +24,15 @@ export class UsersService {
     email: string;
     password: string;
   }): Promise<UserDocument> {
-    return this.model.create(data);
+    const user = await this.model.create(data);
+    this.logger.log(`New user document created: ${user._id.toString()}`);
+    return user;
   }
 
   async incrementTokenVersion(id: string): Promise<void> {
     await this.model
       .updateOne({ _id: id }, { $inc: { tokenVersion: 1 } })
       .exec();
+    this.logger.debug(`Token version incremented for user ${id}`);
   }
 }

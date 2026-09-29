@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { useDirectDnsResolution } from './common/network';
+import { LoggingInterceptor } from './common/logging.interceptor';
 
 useDirectDnsResolution();
 
@@ -15,6 +16,7 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
+  app.useGlobalInterceptors(new LoggingInterceptor());
   await app.listen(process.env.PORT ?? 3001);
 }
 bootstrap();

@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -44,6 +45,8 @@ function toPublicUser(user: UserDocument): PublicUser {
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
@@ -53,11 +56,15 @@ export class AuthService {
   async register(email: string, password: string) {
     const existing = await this.usersService.findByEmail(email);
     if (existing) {
+      this.logger.warn(
+        `Registration attempt with an email already in use: ${email}`,
+      );
       throw new ConflictException('Email is already registered');
     }
 
     const hashed = await bcrypt.hash(password, 10);
     const user = await this.usersService.create({ email, password: hashed });
+    this.logger.log(`User registered: ${email}`);
 
     const tokens = await this.issueTokenPair(user);
     return { ...tokens, user: toPublicUser(user) };
@@ -66,14 +73,17 @@ export class AuthService {
   async login(email: string, password: string) {
     const user = await this.usersService.findByEmail(email);
     if (!user) {
+      this.logger.warn(`Login attempt for unknown email: ${email}`);
       throw new UnauthorizedException('Invalid credentials');
     }
 
     const matches = await bcrypt.compare(password, user.password);
     if (!matches) {
+      this.logger.warn(`Login attempt with an incorrect password: ${email}`);
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    this.logger.log(`User logged in: ${email}`);
     const tokens = await this.issueTokenPair(user);
     return { ...tokens, user: toPublicUser(user) };
   }
@@ -86,19 +96,27 @@ export class AuthService {
         { secret: this.configService.get<string>('JWT_REFRESH_SECRET') },
       );
     } catch {
+      this.logger.warn(
+        'Refresh attempted with an invalid or expired refresh token',
+      );
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
 
     const user = await this.usersService.findById(payload.sub);
     if (!user || user.tokenVersion !== payload.tokenVersion) {
+      this.logger.warn(
+        `Refresh attempted with a stale token for user ${payload.sub}`,
+      );
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
 
+    this.logger.debug(`Access token refreshed for user ${user._id.toString()}`);
     return this.issueTokenPair(user);
   }
 
   async logout(userId: string): Promise<void> {
     await this.usersService.incrementTokenVersion(userId);
+    this.logger.log(`User logged out: ${userId}`);
   }
 
   async me(userId: string): Promise<PublicUser> {
